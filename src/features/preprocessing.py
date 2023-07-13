@@ -5,7 +5,7 @@ import pandas as pd
 from .utils import *
 
 class Preprocessing:
-	def __init__(self, data, cols_to_remove=['id1', 'id2', 'id3'], text_col='text', label_col=''):
+	def __init__(self, data, cols_to_remove, text_col, label_col):
 		self.data = data
 		self.cols_to_remove = cols_to_remove
 		self.text_col = text_col

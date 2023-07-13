@@ -16,6 +16,8 @@
 * **requirements.txt**: Список необходимых библиотек для запуска проекта.
 
 * **src**: Содержит программы для запуска проекта. 
+    * **src/config**: Содержит все настраиваемые параметры (class Parameters для гиперпараметров модели, класс GlobalConfig для проекта (пути к скриптам, данным, модели и предсказаниям модели с учетом структуры проекта, название столбца с метками, названия столбца с текстом, названия столбцов с уникальными id, режим работы проекта (Train(0)/Inference(1)/Both(2)))).
+     **src/logger**: Содержит настройки для логгирования.
     * **src/features**: Содержит скрипты для предобработки данных
         * **features/utils**: Вспомогательные функции для предобработки текста.
         * **features/preprocessing**: Содержит класс Preprocessing, осуществляющий предобработку данных для обучения модели. Обогащение исходных данных попарными делениями числовых признаков (кроме деления на признаки, в которых есть 0) и текстовыми признаками: количество знаков препинания, количество слов, начинающихся с большой буквы, средняя длина слова в комментарии, количество слов, среднее количество слов, начинающихся с большой буквы и среднее количество знаков препинания в пересчете на количество слов. 
@@ -44,16 +46,7 @@
     * **3-zaretskii-evaluation-tuning-L5.ipynb**: Содержит подбор гиперпараметров для выбранных решений и выбор конечной модели. 
     * **4-zaretskii-chosen_model_NoOutliers.ipynb**: Содержит обучение выбранной модели на данных без выбросов.
     
-* **run.py**: Файл с аргументами, заданными в консоли, запускающий проект.  
-    * **path**: путь к папке с проектом (обязательный аргумент).
-    * **mode**: режим работы (Train/Inference/Default (оба последовательно)).
-    * **data_name**: название файла с данными.
-    * **label_column**: название колонки с метками.
-    * **text_column**: название колонки с текстом. 
-    * **model_name**: название обученной модели (для режима inference).
-
-
-
+* **run.py**: Файл для запуска модели с параметрами из ./src/config.  
 
 <!-- how-to-use -->
 ## 3. Использование
@@ -71,11 +64,52 @@ pip install -r requirements.txt
 
 
 
-Параметры можно вручную изменить в файле ./src/model/params
+Параметры можно вручную изменить в файле ./src/config
 
 ```PY
-class Parameters:
-   threshold : float = 0.7
+class GlobalConfig(BaseSettings):
+    #PROJECT_PATH: Path to the project (automatically defined)
+    PROJECT_PATH: Path = Path(
+      os.path.abspath(
+         os.path.join(
+            os.path.dirname(
+               os.path.realpath(__file__)), os.pardir
+            )
+         )
+      )
+
+    # DATA_PATH: Path to the data folder
+    DATA_PATH: Path = PROJECT_PATH / 'data'
+    # RAW_DATA_PATH: Path to the raw data folder
+    RAW_DATA_PATH: Path = 'raw'
+    # PROCESSED_DATA_PATH: Path to the processed data folder
+    PROCESSED_DATA_PATH: Path = 'processed'
+    # TRAIN_DATA_PATH: Train data folder
+    TRAIN_DATA_PATH: Path = Path('train')
+    # INFERENCE_DATA_PATH: Inference data folder
+    INFERENCE_DATA_PATH: Path = Path('inference')
+    # MODEL_PATH: Path to the saved model (after training)
+    MODEL_PATH: Path = PROJECT_PATH / 'models'
+
+    # MODE: Train (0) / Inference (1) mode / Default (2) (both train and inference)
+    MODE: int = 2
+    # DATA_NAME: Name of the raw data file
+    DATA_NAME: str = 'data.csv'
+    # LABEL_COLUMN: Name of the column with labels (when training)
+    LABEL_COLUMN: str = 'label'
+    # TEXT_COLUMN: Name of the text column
+    TEXT_COLUMN: str = 'text'
+    # MODEL_NAME: Name of the trained model
+    MODEL_NAME: str = 'LogRegr.pkl'
+    # PREDICTIONS_NAME: Name of file with predictions (after inference)
+    PREDICTIONS_NAME: str = "LogRegrPredictions.pkl"
+    # IDS: List of Ids to remove
+    IDS: list = ['id1', 'id2', 'id3'] 
+    
+
+#Подобранные параметры модели и порог отбора
+class Parameters(BaseSettings):
+   threshold: float = 0.7
    C: int = 1
    class_weight: str = 'balanced' 
    dual: bool = False
@@ -87,14 +121,9 @@ class Parameters:
    tol: float = 0.001
    warm_start: bool = False
 ```
- 
-Помощь в запуске модели:
-```SH
-python3 run.py -h
-```
 
 Пример запуска модели: 
 
 ```SH
-python3 run.py -p /Users/nzaretski/Desktop/education/wildberries/script/wb_school
+python3 run.py 
 ```

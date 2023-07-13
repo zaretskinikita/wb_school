@@ -1,17 +1,17 @@
 # Модель с подобранными параметрами
 from sklearn.linear_model import LogisticRegression
-from .params import Parameters
+from .. import config
 class Model:
 	def initialize_model(self):
 		return LogisticRegression(
-			C = Parameters.C, 
-			class_weight = Parameters.class_weight,
-			dual = Parameters.dual,
-			fit_intercept = Parameters.fit_intercept,
-			intercept_scaling = Parameters.intercept_scaling,
-			max_iter = Parameters.max_iter, 
-			penalty = Parameters.penalty,
-			solver = Parameters.solver, 
-			tol = Parameters.tol,
-			warm_start = Parameters.warm_start
+			C = config.Parameters.C, 
+			class_weight = config.Parameters.class_weight,
+			dual = config.Parameters.dual,
+			fit_intercept = config.Parameters.fit_intercept,
+			intercept_scaling = config.Parameters.intercept_scaling,
+			max_iter = config.Parameters.max_iter, 
+			penalty = config.Parameters.penalty,
+			solver = config.Parameters.solver, 
+			tol = config.Parameters.tol,
+			warm_start = config.Parameters.warm_start
 			)
